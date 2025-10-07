@@ -39,6 +39,7 @@ filegroup {
         //
         // Images must be aligned to the minimum allocation size of liblp (4kb).
         "data/sideload_test_1.img",
+        "data/sideload_test_2.img",
     ],
 }
 
@@ -56,7 +57,10 @@ genrule {
         "data/dynamic_partitions_info.txt",
     ],
     device_common_srcs: [
-        ":system-build.prop",
+        // Read product/etc/build.prop instead of system/build.prop.
+        // system/build.prop has generic system properties but no product-
+        // specific values.
+        ":product-build.prop",
     ],
     srcs: [
         ":sideload_test_prebuilts",
@@ -68,9 +72,10 @@ genrule {
         "--ota_from_raw_img_path $(location ota_from_raw_img) " +
         "--delta_generator_path $(location delta_generator) " +
         "--package_key $(location :system_dev_certificate{pk8}) " +
-        "--build_prop_file $(location :system-build.prop) ",
+        "--build_prop_file $(location :product-build.prop) ",
     out: [
         "sideload_test_1.zip",
+        "sideload_test_2.zip",
     ],
 }
 
@@ -88,7 +93,7 @@ java_test_host {
         "cts-install-lib-host",
     ],
     test_suites: [
-        "general-tests",
+        "device-tests",
     ],
     data: [
         ":sideload_test_ota_packages",
